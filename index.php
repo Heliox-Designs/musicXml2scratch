@@ -11,7 +11,7 @@
 	);
 
 	//Load musicXML file
-	$xml = simplexml_load_string(file_get_contents("country.xml"));
+	$xml = simplexml_load_string(file_get_contents("feliz.xml"));
 	
 	//Get basic data
 	$title		= "UNKNOWN";
@@ -38,7 +38,8 @@
 					//This is a note
 					$length	= (string) $note -> duration;
 					$step	= (string) $note -> pitch -> step;
-					$value	= intval($note -> pitch -> octave) * 12 + intval($t[$step]);
+					$alter	= (string) $note -> pitch -> alter or "0";
+					$value	= intval($note -> pitch -> octave) * 12 + intval($t[$step]) + intval($alter);
 					//Insert
 					$voice = (string) $note -> voice;
 					$tones[$instruments][] = array($value, $length, $step, $note -> pitch -> octave);
