@@ -20,7 +20,8 @@
 		unlink($path . "/META-INF/container.xml");
 		rmdir($path . "/META-INF");
 		//Get content
-		$contents = file_get_contents($path . "/" . scandir($path)[2]);
+		$dir = scandir($path);
+		$contents = file_get_contents($path . "/" . $dir[2]);
 	}
 	else	{
 		//It's something else
