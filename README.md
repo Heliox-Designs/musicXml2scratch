@@ -9,11 +9,7 @@ This project is **unstable** and might/will produce strange output. For a list o
 visit the [Issues].
 
 ##Convert a musicXML file
-	1. Delete all txt files in the project's directory if present
-	2. Put your name.xml into the same directory as the index.php
-	3. Open index.php, go to line 14 ($xml = simplexml_load_string...)
-	and replace "*.xml" with "name.xml", where name is the filename of
-	your musicXML file
-	4. Call the index.php with a webserver
-	5. A lot of output and hopefully no error messages will appear
-	6. Import the generated text files into Scratch
+    Just use the interface on the index.php
+    
+## Release
+A public beta will be available in 1 or 2 months.   
