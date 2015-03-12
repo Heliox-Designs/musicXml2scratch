@@ -24,43 +24,47 @@
 		foreach($instrument -> measure as $measure)	{
 			//Loop through notes
 			foreach($measure -> note as $note)	{
+				//We need it
+				$length	= (string) $note -> duration;
+				$voice = (string) $note -> voice;
+				$staff = isset($note -> staff) ? intval($note -> staff) : 1;
+			
 				if(isset($note -> rest))	{
-					//This is a rest
-					$length	= (string) $note -> duration;
 					//Insert
-					$voice = (string) $note -> voice;
-					$tones[$instruments][] = array(0, $length);
+					$tones[$instruments][$staff][] = array(0, $length);
 				}
 				elseif(isset($note -> pitch))	{
 					//This is a note
-					$length	= (string) $note -> duration;
 					$step	= (string) $note -> pitch -> step;
 					$alter	= (string) $note -> pitch -> alter or "0";
 					$value	= intval($note -> pitch -> octave) * 12 + intval($t[$step]) + intval($alter);
 					//Insert
-					$voice = (string) $note -> voice;
-					$tones[$instruments][] = array($value, $length, $step, $note -> pitch -> octave);
+					$tones[$instruments][$staff][] = array($value, $length, $step, $note -> pitch -> octave);
 				}
 			}
 		}
 	}
+
 	
 	//Create tmpput
 	$files = array();
 	mkdir($path . "/txt");
 	for($i = 1; $i <= $instruments; $i++)	{
-		$files[$i]["values"] = fopen($path . "/txt/values". $i . ".txt", "w");
-		$files[$i]["lengths"] = fopen($path . "/txt/lengths". $i . ".txt", "w");
-		
-		foreach($tones[$i] as $value)	{
-			fwrite($files[$i]["values"], $value[0] . "\n");
+		for($x = 1; $x <= count($tones[$i]); $x++) {
+			
+			$files[$i]["values"] = fopen($path . "/txt/values". $i . "hand". $x .".txt", "w");
+			$files[$i]["lengths"] = fopen($path . "/txt/lengths". $i . "hand". $x .".txt", "w");
+			
+			foreach($tones[$i][$x] as $value)	{
+				fwrite($files[$i]["values"], $value[0] . "\n");
+			}
+			foreach($tones[$i][$x] as $length)	{
+				fwrite($files[$i]["lengths"], $length[1] . "\n");
+			}
+			
+			fclose($files[$i]["values"]);
+			fclose($files[$i]["lengths"]);
 		}
-		foreach($tones[$i] as $length)	{
-			fwrite($files[$i]["lengths"], $length[1] . "\n");
-		}
-		
-		fclose($files[$i]["values"]);
-		fclose($files[$i]["lengths"]);
 	}
 	
 	//Zip file
@@ -68,8 +72,11 @@
 	$out -> open($path . "/lists.zip", ZIPARCHIVE::CREATE);
 	
 	for($i = 1; $i <= $instruments; $i++)	{
-		$out -> addFile($path . "/txt/values" . $i . ".txt", "values" . $i . ".txt");
-		$out -> addFile($path . "/txt/lengths" . $i . ".txt", "lengths" . $i . ".txt");
+		for($x = 1; $x <= count($tones[$i]); $x++) {
+			
+			$out -> addFile($path . "/txt/values". $i . "hand". $x .".txt", "values". $i . "hand". $x .".txt");
+			$out -> addFile($path . "/txt/lengths". $i . "hand". $x .".txt", "lengths". $i . "hand". $x .".txt");
+		}
 	}
 	
 	$out -> close();
